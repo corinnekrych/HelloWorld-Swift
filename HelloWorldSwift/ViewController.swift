@@ -22,6 +22,27 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "registered", name: "success_registered", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "errorRegistration", name: "error_register", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "messageReceived:", name: "message_received", object: nil)
+        
+        
+        var date = NSDateComponents()
+        date.year = 2014
+        date.month = 06
+        date.day = 20
+        date.hour = 14
+        date.minute = 27
+        
+        date.timeZone = NSTimeZone.systemTimeZone()
+        
+        var calendar = NSCalendar(calendarIdentifier: NSGregorianCalendar)
+        var myDate = calendar.dateFromComponents(date)
+
+        let localNotification1 = UILocalNotification()
+        localNotification1.fireDate = myDate
+        localNotification1.category = "HelloWorld"
+        localNotification1.alertBody = "Ping!"
+        localNotification1.repeatInterval = NSCalendarUnit.SecondCalendarUnit
+        UIApplication.sharedApplication().scheduleLocalNotification(localNotification1)
+        
     }
 
     override func didReceiveMemoryWarning() {

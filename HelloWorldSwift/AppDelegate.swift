@@ -15,14 +15,72 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                             
     var window: UIWindow?
 
-
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: NSDictionary?) -> Bool {
+    /** TODO on UPS sender
+    { "aps" : {
+        "alert": "you're invited",
+        "category": "HelloWorld"
+        }
+    }
+    **/
+    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: NSDictionary) -> Bool {
         // Override point for customization after application launch.
-        
-        let settings = UIUserNotificationSettings(forTypes: .Alert | .Badge, categories: nil)
+        let category = registerAction()
+        var categories = NSMutableSet()
+        categories.addObject(category)
+        let settings = UIUserNotificationSettings(forTypes: .Alert | .Badge, categories:categories)
         UIApplication.sharedApplication().registerUserNotificationSettings(settings)
         UIApplication.sharedApplication().registerForRemoteNotifications()
+        
+        //if (launchOptions != nil) { //&& launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey] != nil) {
+            //if (launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey] != nil) {
+            //NSLog("Was opened with notification:%@",launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]);
+            
+            //let defaults = NSUserDefaults.standardUserDefaults()
+            //let options =  launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey] as NSDictionary
+            //let messageReceived = options["message_received"] as NSDictionary
+            //let msg1 = options["aps"] as NSDictionary
+            //let msg2 = msg1["alert"] as String
+            //defaults.object = msg2
+            //defaults.synchronize()
+        //}
+        //}
+        // Register local notification to tes categories
+        
+        
+
+
         return true
+    }
+    
+    func registerAction() -> UIMutableUserNotificationCategory {
+        let action1 = UIMutableUserNotificationAction()
+        action1.identifier = "Accept"
+        action1.title = "Accept"
+        action1.activationMode = .Background
+        action1.destructive = false
+        action1.authenticationRequired = false
+        
+        let action2 = UIMutableUserNotificationAction()
+        action2.identifier = "Trash"
+        action2.title = "Trash"
+        action2.activationMode = .Background
+        action2.destructive = true
+        action2.authenticationRequired = true
+        
+        let action3 = UIMutableUserNotificationAction()
+        action3.identifier = "Reply"
+        action3.title = "Reply"
+        action3.activationMode = .Foreground
+        action3.destructive = false
+        action3.authenticationRequired = false
+        
+        let category = UIMutableUserNotificationCategory()
+        category.identifier = "HelloWorld"
+        category.setActions([action1, action2, action3], forContext: .Default)
+        category.setActions([action1, action3], forContext: .Minimal)
+        return category
+        
+        
     }
 
     func applicationWillResignActive(application: UIApplication) {
@@ -52,10 +110,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let registration = AGDeviceRegistration(serverURL: NSURL(string: "<# URL of the running AeroGear UnifiedPush Server #>"))
         
         registration.registerWithClientInfo({ (clientInfo: AGClientDeviceInformation!) -> () in
-                NSLog("UPS Register")
-                clientInfo.deviceToken = deviceToken
-                clientInfo.variantID = "<# Variant Id #>"
-                clientInfo.variantSecret = "<# Variant Secret #>"
+            NSLog("UPS Register")
+            clientInfo.deviceToken = deviceToken
+            clientInfo.variantID = "<# Variant Id #>"
+            clientInfo.variantSecret = "<# Variant Secret #>"
             
                 // apply the token, to identify THIS device
                 let currentDevice = UIDevice()
@@ -69,12 +127,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 NSLog("UPS Success Register")
                 // Send NSNotification for success_registered, will be handle by registered AGViewController
                 let notification = NSNotification(name:"success_registered", object: nil)
-                NSNotificationCenter().postNotification(notification)
+                NSNotificationCenter.defaultCenter().postNotification(notification)
                 
             }, failure: { (error:NSError!) -> () in
                 NSLog("UPS Error Register")
-                let notification = NSNotification(name:"error_registered", object: nil)
-                NSNotificationCenter().postNotification(notification)
+                let notification = NSNotification(name:"error_register", object: nil)
+                NSNotificationCenter.defaultCenter().postNotification(notification)
             })
     }
     
@@ -84,11 +142,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(application: UIApplication!, didReceiveRemoteNotification userInfo: NSDictionary!) {
         // When a message is received, send NSNotification, will be handle by registered AGViewController
-        let notification:NSNotification = NSNotification(name:"message_received", object:userInfo)
+        let notification = NSNotification(name:"message_received", object:userInfo)
         NSNotificationCenter.defaultCenter().postNotification(notification)
         NSLog("UPS message received: %@", userInfo);
     }
+    
+    func application(application: UIApplication!, didReceiveLocalNotification userInfo: NSDictionary!) {
+         NSLog("Local message received: %@", userInfo);
+        var msg =  NSMutableDictionary(dictionary: ["aps":["alert":"Ping..opened"]])
+        
+        let notification = NSNotification(name:"message_received", object:msg)
+        NSNotificationCenter.defaultCenter().postNotification(notification)
+    }
+    
+    func application(application: UIApplication!, handleActionWithIdentifier identifier: String!, forLocalNotification notification: UILocalNotification!, completionHandler: (() -> Void)!) {
+        if(identifier == "Accept") {
+            
+            var msg =  NSMutableDictionary(dictionary: ["aps":["alert":notification.alertBody+"..accepted"]])
 
+            let notification = NSNotification(name:"message_received", object:msg)
+            NSNotificationCenter.defaultCenter().postNotification(notification)
+        } else if(identifier == "Trash") {
+            var msg =  NSMutableDictionary(dictionary: ["aps":["alert":notification.alertBody+"..trashed"]])
+            
+            let notification = NSNotification(name:"message_received", object:msg)
+            NSNotificationCenter.defaultCenter().postNotification(notification)
+        
+        } else if(identifier == "Reply") {
+        
+        }
+        completionHandler()
+    }
 
 }
 

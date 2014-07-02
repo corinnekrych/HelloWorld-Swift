@@ -30,24 +30,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let settings = UIUserNotificationSettings(forTypes: .Alert | .Badge, categories:categories)
         UIApplication.sharedApplication().registerUserNotificationSettings(settings)
         UIApplication.sharedApplication().registerForRemoteNotifications()
-        
-        //if (launchOptions != nil) { //&& launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey] != nil) {
-            //if (launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey] != nil) {
-            //NSLog("Was opened with notification:%@",launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]);
-            
-            //let defaults = NSUserDefaults.standardUserDefaults()
-            //let options =  launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey] as NSDictionary
-            //let messageReceived = options["message_received"] as NSDictionary
-            //let msg1 = options["aps"] as NSDictionary
-            //let msg2 = msg1["alert"] as String
-            //defaults.object = msg2
-            //defaults.synchronize()
-        //}
-        //}
-        // Register local notification to tes categories
-        
-        
-
 
         return true
     }
